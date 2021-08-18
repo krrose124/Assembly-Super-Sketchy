@@ -1,0 +1,9 @@
+data:
+!int = 68
+!array = [ 12 13 15 ]
+!string = 'lol'
+code:
+add $a1 $a2 $a3
+set $a5 30
+set $p 10
+syscall A
