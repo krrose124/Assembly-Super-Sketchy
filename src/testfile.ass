@@ -6,4 +6,4 @@ code:
 add $a1 $a2 $a3
 set $a5 30
 set $p 10
-syscall A
+syscall 10

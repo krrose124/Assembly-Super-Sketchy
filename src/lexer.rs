@@ -12,17 +12,17 @@ pub enum Tokens {
     Hptr,Sptr,Link,
     Zero,Prnt,
     Gtr,Less,Equal,
-    Register,Syscall,
+    Register(String),Syscall,
     Mv,Cpy,Set,
-    Data,Code,Flag,Hex,Num,
+    Data,Code,Flag,Hex,Num(String),
     And,Or,Not,
-    Jmp,Nop,
-    Load,Store,
+    Jmp,Nop, Decl, Var,
+    Load,Store, Str,
     Lbkt, Rbkt, Comma
 }
 impl fmt::Display for Tokens {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match *self {
+        match &*self {
             Tokens::Add => write!(f, "add"),
             Tokens::Sub => write!(f, "sub"),
             Tokens::Mult => write!(f, "mult"),
@@ -39,7 +39,7 @@ impl fmt::Display for Tokens {
             Tokens::Gtr => write!(f, "gtr"),
             Tokens::Less => write!(f, "less"),
             Tokens::Equal => write!(f, "eql"),
-            Tokens::Register => write!(f, "Custom Register"),
+            Tokens::Register(val) => write!(f, "Custom Register {}", val),
             Tokens::Syscall => write!(f, "Syscall"),
             Tokens::Mv => write!(f, "mv"),
             Tokens::Cpy => write!(f, "cpy"),
@@ -48,7 +48,7 @@ impl fmt::Display for Tokens {
             Tokens::Code => write!(f, "code"),
             Tokens::Flag => write!(f, "Custom Flag"),
             Tokens::Hex => write!(f, "Custom Hex"),
-            Tokens::Num => write!(f, "Custom Number"),
+            Tokens::Num(val) => write!(f, "Custom Number {}", val),
             Tokens::And => write!(f, "and"),
             Tokens::Or => write!(f, "or"),
             Tokens::Not => write!(f, "not"),
@@ -59,6 +59,9 @@ impl fmt::Display for Tokens {
             Tokens::Lbkt => write!(f, "["),
             Tokens::Rbkt => write!(f, "]"),
             Tokens::Comma => write!(f, ","),
+            Tokens::Decl => write!(f, "="),
+            Tokens::Str => write!(f, "String"),
+            Tokens::Var => write!(f, "Var"),
         }
     }
 }
@@ -78,9 +81,12 @@ pub fn lex(filename: String) -> Vec<Tokens> {
         ]).unwrap();
     //let register = Regex::new(r"\$[a-z]+[0-9]+").unwrap();
     let lang = RegexSet::new(&[
-        r"[[:xdigit:]]", r"[[:digit:]]+", r"data:", r"code:",
+        r"data:", r"code:",
         r"\$[[:alpha:]]+[[:digit:]]+", r"[[:alpha:]]+:", r"\[", r"\]", r"=",
         r"'[[[:alnum:]]|[[:space:]]|[[:punct:]]]+'", r"![[:alpha:]]+",]).unwrap();
+    let number = RegexSet::new(&[
+        r"[[:digit:]]+",
+        ]).unwrap();
 
     let file = File::open(filename).unwrap();
     let reader = BufReader::new(file);
@@ -107,9 +113,10 @@ Colon, Comma
             let opmatches:Vec<_> = operations.matches(word).into_iter().collect();
             let sregmatch:Vec<_> = sreg.matches(word).into_iter().collect();
             let langmatch:Vec<_> = lang.matches(word).into_iter().collect();
+            let numbermatch:Vec<_> = number.matches(word).into_iter().collect();
             //let test = "Test value " + word ;
             //println!("{}",word);
-            if opmatches.len() == 0 && sregmatch.len() == 0 && langmatch.len() == 0{
+            if opmatches.len() == 0 && sregmatch.len() == 0 && langmatch.len() == 0 && numbermatch.len() ==0 {
                 let test = "Lexer Error with ".to_string() + word;
                 println!("{}",test);
                 let build = tables::ErrorMessage{message:test.to_string(), isError:true};
@@ -142,7 +149,7 @@ Colon, Comma
                     _ => println!("Error"),
                 }
             }
-            if sregmatch.len() > 0{
+            else if sregmatch.len() > 0{
                 match sregmatch[0]{
                     0 => token.push(Tokens::Hi),
                     1 => token.push(Tokens::Lo),
@@ -153,6 +160,25 @@ Colon, Comma
                     6 => token.push(Tokens::Link),
                     _ => println!("Error"),
                 }
+            }
+            else if langmatch.len() > 0 {
+                match langmatch[0]{
+                    //0 => token.push(Tokens::Hex),
+                    //0 => token.push(Tokens::Num),
+                    0 => token.push(Tokens::Data),
+                    1 => token.push(Tokens::Code),
+                    2 => token.push(Tokens::Register(word.to_string())),
+                    3 => token.push(Tokens::Flag),
+                    4 => token.push(Tokens::Lbkt),
+                    5 => token.push(Tokens::Rbkt),
+                    6 => token.push(Tokens::Decl),
+                    7 => token.push(Tokens::Str),
+                    8 => token.push(Tokens::Var),
+                    _ => println!("Error"),
+                }
+            }
+            else {
+                token.push(Tokens::Num(word.to_string()));
             }
 
             //println!("{}. {}", index+1, word);
