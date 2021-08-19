@@ -76,7 +76,7 @@ pub fn lex(filename: String) -> Vec<Tokens> {
         r"and", r"or", r"not",
         ]).unwrap();
     let sreg = RegexSet::new(&[
-        r"\$hi", r"\&lo", r"\$zero", r"\$p",
+        r"\$hi", r"\$lo", r"\$zero", r"\$p",
         r"\$hptr", r"\$sptr", r"\$link",
         ]).unwrap();
     //let register = Regex::new(r"\$[a-z]+[0-9]+").unwrap();
