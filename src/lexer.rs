@@ -4,8 +4,9 @@ use std::io::{BufRead, BufReader};
 use regex::RegexSet;
 use regex::Regex;
 use std::fmt;
-mod tables;
+#[path = "./lexer/tables.rs"] mod tables;
 
+#[derive(PartialEq)]
 pub enum Tokens {
     Add,Sub,Mult,Div,Mod,
     Jal,Hi,Lo,
