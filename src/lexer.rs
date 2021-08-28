@@ -15,11 +15,11 @@ pub enum Tokens {
     Gtr,Less,Equal,
     Register(String),Syscall,
     Mv,Cpy,Set,
-    Data,Code,Flag(String),Hex,Num(String),
+    Data,Code,Flag(String),Num(String),
     And,Or,Not,
     Jmp,Nop, Decl, Var,
     Load,Store, Str,
-    Lbkt, Rbkt, Comma
+    Lbkt, Rbkt,
 }
 impl fmt::Display for Tokens {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -95,21 +95,6 @@ pub fn lex(filename: String) -> Vec<Tokens> {
     for (index, line) in reader.lines().enumerate(){
 
         let line = line.unwrap();
-/*
-Add,Sub,Mult,Div,Mod,
-Jal,Hi,Lo,
-Hptr,Sptr,Link,
-Zero,Prnt,
-Gtr,Less,Equal,
-Register,Syscall,
-Mv,Cpy,Set,
-Data,Code,Flag,Hex,Num,
-And,Or,Not,
-Jmp,Nop,
-Load,Store,
-Lbkt, Rbkt,
-Colon, Comma
-*/
         for word in line.split_whitespace(){
             let opmatches:Vec<_> = operations.matches(word).into_iter().collect();
             let sregmatch:Vec<_> = sreg.matches(word).into_iter().collect();
@@ -164,8 +149,6 @@ Colon, Comma
             }
             else if langmatch.len() > 0 {
                 match langmatch[0]{
-                    //0 => token.push(Tokens::Hex),
-                    //0 => token.push(Tokens::Num),
                     0 => token.push(Tokens::Data),
                     1 => token.push(Tokens::Code),
                     2 => token.push(Tokens::Register(word.to_string())),
@@ -182,7 +165,7 @@ Colon, Comma
                 token.push(Tokens::Num(word.to_string()));
             }
 
-            //println!("{}. {}", index+1, word);
+            
         }
 
 
