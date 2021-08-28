@@ -5,5 +5,28 @@ data:
 code:
 add $a1 $a2 $a3
 set $a5 30
+sub $zero $hi $lo
+mult $hptr $sptr
+div $a0 $a1
+mod $link $a3
+jal flag:
+flag:
+nop
+gtr $a10 $zero yay:
+yay:
+less $a11 $b12 battleship:
+battleship:
+eql $b15 $c45 bingo:
+bingo:
+mv $hptr $aaa911
+set $lol69 420
+jmp here:
+here:
+and $me1 $zero
+or $a10 $a20
+
+load $sptr 4 $p
+store $a10 $sptr 4
+not $zero $a1
 set $p 10
 syscall 10
